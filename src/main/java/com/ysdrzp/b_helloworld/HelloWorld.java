@@ -1,11 +1,11 @@
 package com.ysdrzp.b_helloworld;
 
 import java.util.List;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngines;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+
+import org.activiti.engine.*;
+import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.task.Task;
 import org.junit.Test;
@@ -28,23 +28,27 @@ public class HelloWorld {
 	 */
 
 	/**
-	 * 得到流程引擎
+	 * 0、得到流程引擎
 	 */
 	private ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
-	
+
+	/**
+	 * 1、流程部署
+	 */
 	@Test
 	public void deployProcess() {
 		/**
 		 * 流程图的部署、修改、删除
 		 * 涉及到的表：
-		 * 		act_ge_bytearray,
-		 * 		act_re_deployment,
-		 * 		act_re_model,
-		 * 		act_re_procdef
+		 * 		act_ge_bytearray,通用的流程定义和流程资源
+		 * 		act_ge_property,系统相关属性
+		 * 		act_re_deployment,流程部署信息
+		 * 		act_re_procdef,流程定义信息
+		 * 		act_re_model,模型信息
 		 */
 		RepositoryService repositoryService = this.processEngine.getRepositoryService();
 		Deployment deploy = repositoryService.createDeployment().name("请假流程001")
-				.addClasspathResource("HelloWorld.bpmn.xml.xml")
+				.addClasspathResource("HelloWorld.bpmn")
 				.addClasspathResource("HelloWorld.png")
 				.deploy();
 
@@ -52,36 +56,47 @@ public class HelloWorld {
 	}
 
 	/**
-	 * 启动流程
+	 * 2、启动流程
 	 */
 	@Test
 	public void startProcess() {
 		/**
 		 * 流程的运行
 		 * 涉及的表：
+		 * 		act_ru_execution,运行时流程执行实例
+		 * 		act_ru_identitylink,当前节点参与者的信息,任务参与者数据
+		 * 		act_ru_task,运行时任务数据信息
+		 * 		act_ru_variable,运行时流程变量数据信息
 		 * 		act_ru_event_subscr,
-		 * 		act_ru_execution,
-		 * 		act_ru_identitylink,
 		 * 		act_ru_job,
-		 * 		act_ru_task,
-		 * 		act_ru_variable
 		 */
 		RuntimeService runtimeService = this.processEngine.getRuntimeService();
-		String processDefinitionId="HelloActiviti:1:4";
-//		runtimeService.startProcessInstanceById(processDefinitionId);
 
-		String processDefinitionKey="HelloActiviti";
+		/**
+		 * 流程ID - HelloWorld:1:4。【由“流程编号：流程版本号：自增长ID”组成】
+		 * 根据流程定义ID,启动任务
+		 */
+		//String processDefinitionId="HelloWorld:1:4";
+		//runtimeService.startProcessInstanceById(processDefinitionId);
+
+		/**
+		 * 流程编号：HelloWorld
+		 */
+		String processDefinitionKey="HelloWorld";
 		runtimeService.startProcessInstanceByKey(processDefinitionKey);
 		System.out.println("流程启动成功");
 	}
 	
 	/**
-	 * 查询任务
+	 * 3、查询任务
 	 */
 	@Test
 	public void findTask() {
+
+		System.out.println("################################运行任务实例################################");
+
 		TaskService taskService = this.processEngine.getTaskService();
-		String assignee="王五";
+		String assignee = "王五";
 		List<Task> list = taskService.createTaskQuery().taskAssignee(assignee).list();
 		if(null!=list&&list.size()>0) {
 			for (Task task : list) {
@@ -97,7 +112,7 @@ public class HelloWorld {
 	}
 	
 	/**
-	 * 办理任务
+	 * 4、办理任务
 	 */
 	@Test
 	public void completeTask() {
@@ -108,10 +123,69 @@ public class HelloWorld {
 	}
 
 	/**
-	 * 历史任务查询
+	 * 5、历史任务查询
+	 * 涉及的表：
+	 * 		act_hi_taskinst,历史任务实例信息
+	 * 		act_hi_procinst,历史流程实例信息
+	 * 		act_hi_actinst,历史节点信息
+	 * 		act_hi_identitylink,历史流程人员表
+	 * 		act_hi_varinst,历史变量信息
 	 */
 	@Test
 	public void queryTaskHistory(){
+
+		HistoryService historyService = this.processEngine.getHistoryService();
+
+		/**
+		 * 流程实例ID - 2501
+		 */
+		String processInstanceId = "2501";
+
+		System.out.println("################################历史任务实例################################");
+
+		/**
+		 * 历史任务实例查询
+		 */
+		List<HistoricTaskInstance> historicTaskInstances = historyService.createHistoricTaskInstanceQuery()
+				.processInstanceId(processInstanceId)
+				.list();
+
+		if (null != historicTaskInstances && historicTaskInstances.size() > 0){
+			for (HistoricTaskInstance taskInstance : historicTaskInstances){
+				System.out.println("任务ID:" + taskInstance.getId());
+				System.out.println("任务名称:" + taskInstance.getName());
+				System.out.println("执行实例ID:" + taskInstance.getExecutionId());
+				System.out.println("流程实例ID:" + taskInstance.getProcessInstanceId());
+				System.out.println("流程定义ID:" + taskInstance.getProcessDefinitionId());
+				System.out.println("任务办理人:" + taskInstance.getAssignee());
+				System.out.println("申请时间:" + taskInstance.getStartTime());
+				System.out.println("审批时间:" + taskInstance.getEndTime());
+				System.out.println("################################");
+			}
+		}
+
+		System.out.println("################################历史流程实例################################");
+
+		/**
+		 * 历史流程实例查询
+		 */
+		List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+				.processInstanceId(processInstanceId)
+				.list();
+
+		if (null != historicProcessInstances && historicProcessInstances.size() > 0){
+			for (HistoricProcessInstance historicProcessInstance : historicProcessInstances){
+				System.out.println("执行实例ID:" + historicProcessInstance.getId());
+				System.out.println("流程实例ID:" + processInstanceId);
+				System.out.println("流程定义ID:" + historicProcessInstance.getProcessDefinitionId());
+				System.out.println("流程定义Key:" + historicProcessInstance.getProcessDefinitionKey());
+				System.out.println("流程定Name:" + historicProcessInstance.getProcessDefinitionName());
+				System.out.println("流程部署ID:" + historicProcessInstance.getDeploymentId());
+				System.out.println("流程开始时间:" + historicProcessInstance.getStartTime());
+				System.out.println("审批完成时间:" + historicProcessInstance.getEndTime());
+				System.out.println("################################");
+			}
+		}
 
 	}
 	
