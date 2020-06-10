@@ -1,14 +1,13 @@
 package com.ysdrzp.b_helloworld;
 
-import java.util.List;
-
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.task.Task;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * 入门工作流 - 模拟请假的流程
@@ -177,7 +176,6 @@ public class HelloWorld {
 				System.out.println("################################");
 			}
 		}
-
 	}
 	
 }
