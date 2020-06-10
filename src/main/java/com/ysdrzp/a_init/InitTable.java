@@ -38,17 +38,17 @@ public class InitTable {
 		configuration.setDataSource(dataSource);
 
 		/**
-		 * 几种策略
-		 * ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE 如果数据库里面没有表，也不会创建
-		 * ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP 创建表，使用完之后删除
-		 * ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE 如果数据库里面没有表，就创建
-		 * drop-create 代表如果数据库里面有表，那么先删除再创建
+		 * 指定策略
+		 * ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE：如果数据库里面没有表，也不会创建
+		 * ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP： 创建表，使用完之后删除
+		 * ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE： 如果数据库里面没有表，就创建
+		 * drop-create： 如果数据库里面有表，那么先删除再创建
 		 */
 
 		/**
 		 * 4、配置表的初始化的方式
 		 */
-		configuration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+		configuration.setDatabaseSchemaUpdate("drop-create");
 
 		/**
 		 * 5、得到流程引擎【核心】
