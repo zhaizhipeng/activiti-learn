@@ -16,18 +16,6 @@ import org.junit.Test;
 public class HelloWorld {
 
 	/**
-	 *
-	 * 		//查询历史记录的服务器act_hi_actinst, act_hi_attachment, act_hi_comment, act_hi_detail, act_hi_identitylink, act_hi_procinst, act_hi_taskinst, act_hi_varinst
-	 * 		HistoryService historyService = processEngine.getHistoryService();
-	 * 		//页面表单的服务器[了解]
-	 * 		FormService formService = processEngine.getFormService();
-	 * 		//对工作流的用户管理的表的操作act_id_group, act_id_info, act_id_membership, act_id_user
-	 * 		IdentityService identityService = processEngine.getIdentityService();
-	 * 		//管理器
-	 * 		ManagementService managementService = processEngine.getManagementService();
-	 */
-
-	/**
 	 * 0、得到流程引擎
 	 */
 	private ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
@@ -130,6 +118,9 @@ public class HelloWorld {
 	 * 		act_hi_actinst,历史节点信息
 	 * 		act_hi_identitylink,历史流程人员表
 	 * 		act_hi_varinst,历史变量信息
+	 * 		act_hi_attachment,
+	 * 		act_hi_comment,
+	 * 		act_hi_detail
 	 */
 	@Test
 	public void queryTaskHistory(){
