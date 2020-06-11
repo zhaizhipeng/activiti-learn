@@ -24,9 +24,6 @@ import org.junit.Test;
  */
 public class TestProcessDef {
 
-	/**
-	 * 得到流程引擎
-	 */
 	private ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
 
 	/**
