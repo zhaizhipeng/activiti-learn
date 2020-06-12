@@ -126,7 +126,7 @@ public  class TestProcessVariables {
 	}
 	
 	/**
-	 * 查询历史的流程变量
+	 * 查询历史的流程变量。涉及的表：act_hi_varinst
 	 */
 	@Test
 	public void getHistoryVariables() {
